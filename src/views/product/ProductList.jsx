@@ -16,6 +16,9 @@ const ProductList = () => {
   const [limit] = useState(30)
 
   const handlePageClick = async (page) => {
+    // เมื่อมีการคลิกที่หน้าใหม่
+    // ให้เซ็ตค่าหน้าปัจจุบันเป็นหน้าใหม่ที่คลิกมา currentPage เป็น page
+    // โดยใช้ setCurrentPage
     setCurrentPage(page)
   }
 
@@ -23,6 +26,19 @@ const ProductList = () => {
     const getProducts = async () => {
       try {
         setLoading(true)
+        // เรียก API ดึงรายการสินค้า
+        // โดยใช้ axios.get
+        // โดยใช้ limit และ skip
+        // โดยใช้ limit เป็น 30
+        // โดยใช้ skip เป็น (currentPage - 1) * limit
+        // โดยใช้ await
+        // โดยใช้ setProducts เพื่อเก็บข้อมูลสินค้า
+        // โดยใช้ setLoading เพื่อเปลี่ยนสถานะ loading เป็น false
+        // โดยใช้ setTotalPages เพื่อเก็บจำนวนหน้าทั้งหมด
+        // โดยใช้ Math.ceil(data.total / data.limit) เพื่อคำนวณจำนวนหน้า
+        // โดยใช้ data.total เพื่อเก็บจำนวนสินค้าทั้งหมด
+        // โดยใช้ data.limit เพื่อเก็บจำนวนสินค้าต่อหน้า
+        // โดยใช้ data.products เพื่อเก็บข้อมูลสินค้า
         const { data } = await axios.get('https://dummyjson.com/products', {
           params: {
             limit: limit,
@@ -33,8 +49,6 @@ const ProductList = () => {
         setLoading(false)
 
         let pages = Math.ceil(data.total / data.limit)
-
-        console.log('pages', pages)
         setTotalPages(pages)
       } catch {
         setLoading(false)
@@ -82,6 +96,8 @@ const ProductList = () => {
               )
             })}
           </div>
+          {/* Pagination */}
+          {/* ถ้าจำนวนหน้ามากกว่า 1 ให้แสดง Pagination */}
           {totalPages > 1 ? <>
             <ResponsivePagination
               current={currentPage}
@@ -95,4 +111,3 @@ const ProductList = () => {
   )
 }
 export default ProductList
-// This component is a placeholder for the product list page.
