@@ -1,4 +1,3 @@
-import UserList from '@/pages/admin/user/UserList'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -6,7 +5,7 @@ export const metadata: Metadata = {
 }
 
 const Page = () => {
-  return <UserList />
+  return <div>User Detail</div>
 }
 
 export default Page

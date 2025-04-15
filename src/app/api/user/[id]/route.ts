@@ -1,11 +1,10 @@
 import { NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client'
 import { getToken } from "next-auth/jwt"
-import bcrypt from 'bcrypt'
 
 const prisma = new PrismaClient()
 
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest, { params }: { params: { id: number } },) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   
   if (!token || token.role !== 'admin') {
@@ -13,18 +12,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const users = await prisma.user.findMany({
+    return Response.json(await prisma.user.findFirst({
+      where: { id: Number(params.id), deleted: false },
       omit: {
         password: true
-      },
-      where:{
-        deleted: false
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    })
-    return Response.json(users)
+      }
+    }))
   } catch (error) {
     return new Response(error as BodyInit, {
       status: 500,
@@ -32,7 +25,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: number } },) {
   const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
   
   if (!token || token.role !== 'admin') {
@@ -40,21 +33,13 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const { name, email, password, role } = await request.json()
-    const hashedPassword = bcrypt.hashSync(password, 10)
-    const newUser = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role,
-      },
-    })
-    return Response.json(newUser)
+    return Response.json(await prisma.user.update({
+      where: { id: Number(params.id) },
+      data: { deleted: true }
+    }))
   } catch (error) {
     return new Response(error as BodyInit, {
       status: 500,
     })
   }
 }
-

@@ -1,9 +1,10 @@
 export interface UserInterface {
-  id: string
+  id: number
   name: string
   email: string
-  image: string
+  password?: string
+  image?: string
   role: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt?: Date
+  updatedAt?: Date
 }
