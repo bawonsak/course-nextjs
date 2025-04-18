@@ -16,6 +16,8 @@ export interface ProductInterface {
   Brand?: BrandInterface
   createdAt?: Date
   updatedAt?: Date
+  image?: string
+  base64Image?: string
 }
 
 export interface BrandInterface {

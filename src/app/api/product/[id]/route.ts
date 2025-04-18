@@ -1,6 +1,9 @@
 import { PrismaClient } from "@prisma/client"
 import { getToken } from "next-auth/jwt"
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import fs from 'fs'
+import path from 'path'
+import { storage } from '@/libs/firebase-admin'
 
 const prisma = new PrismaClient()
 
@@ -38,15 +41,56 @@ export async function POST(request: NextRequest, { params }: { params: { id: num
 
   try {
     const { id } = await params
-    const { name, brandId } = await request.json()
-    const newProduct = await prisma.product.update({
+    const { name, brandId, base64Image } = await request.json()
+    let imageurl = ''
+
+    if (base64Image) {
+      const matches = base64Image.match(/^data:image\/(\w+);base64,(.+)$/)
+      
+      if (!matches || matches.length !== 3) {
+        return NextResponse.json({ error: 'Malformed base64 string' }, { status: 400 });
+      }
+
+      const extension = matches[1]; // png, jpeg, etc.
+      const base64Data = matches[2];
+      const buffer = Buffer.from(base64Data, 'base64');
+      const fileName = `${Date.now()}.${extension}`;
+
+      if (process.env.STORAGE == 'firebase') {
+        const bucketFile = storage.bucket().file('uploads/' + fileName);
+        await bucketFile.save(buffer, {
+          metadata: {
+            contentType: `image/${extension}`,
+          },
+          public: true,
+        });
+
+        imageurl = `https://storage.googleapis.com/${bucketFile.bucket.name}/uploads/${fileName}`;
+      } else {
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+        const filePath = path.join(uploadDir, fileName);
+
+        // สร้างโฟลเดอร์ถ้ายังไม่มี
+        if (!fs.existsSync(uploadDir)) {
+          fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        // เขียนไฟล์ลงดิสก์
+        fs.writeFileSync(filePath, buffer);
+
+        imageurl = `uploads/${fileName}`;
+      }
+    }
+
+    const updateProduct = await prisma.product.update({
       where: { id: Number(id) },
       data: { 
         name, 
-        brandId: brandId == 0 ? null : brandId 
+        brandId: brandId == 0 ? null : brandId,
+        image: imageurl == '' ? null : imageurl
       }
     })
-    return Response.json(newProduct)
+    return Response.json(updateProduct)
   } catch (error) {
     return new Response(error as BodyInit, {
       status: 500,

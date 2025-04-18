@@ -54,5 +54,6 @@ model Product {
   brandId   Int?
   updatedAt DateTime? @db.Timestamp(6)
   deleted   Boolean   @default(false)
+  image     String?
   Brand     Brand?    @relation(fields: [brandId], references: [id], onDelete: Cascade)
 }
