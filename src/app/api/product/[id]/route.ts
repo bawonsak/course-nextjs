@@ -7,7 +7,13 @@ import { storage } from '@/libs/firebase-admin'
 
 const prisma = new PrismaClient()
 
-export async function GET(request: NextRequest, { params }: { params: { id: number } },) {
+export async function GET(request: NextRequest, { params }: { params: { id: number } }) {
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET })
+  
+  if (!token || token.role !== 'admin') {
+    return new Response("Unauthorized", { status: 401 });
+  }
+
   try {
     const { id } = await params
     const product = await prisma.product.findFirst({
