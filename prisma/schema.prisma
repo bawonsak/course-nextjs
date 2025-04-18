@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -19,12 +13,12 @@ model User {
   email         String    @unique
   password      String?
   image         String?
-  role          String    @default("member") // Add a role field
-  emailVerified DateTime?
-  accounts      Account[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  emailVerified DateTime?
+  role          String    @default("member")
   deleted       Boolean   @default(false)
+  accounts      Account[]
 }
 
 model Account {
@@ -33,15 +27,32 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+}
+
+model Brand {
+  id        Int       @id
+  name      String?   @db.VarChar
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt DateTime? @db.Timestamp(6)
+  Product   Product[]
+}
+
+model Product {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  brandId   Int?
+  updatedAt DateTime? @db.Timestamp(6)
+  deleted   Boolean   @default(false)
+  Brand     Brand?    @relation(fields: [brandId], references: [id], onDelete: Cascade)
 }

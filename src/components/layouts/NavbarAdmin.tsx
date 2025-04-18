@@ -90,14 +90,11 @@ const ResponsiveAppBar = () => {
                 onClose={handleCloseNavMenu}
                 sx={{ display: { xs: 'block', md: 'none' } }}
               >
-                <MenuItem onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>Protected</Typography>
+                <MenuItem LinkComponent={Link} href='/admin/user'>
+                  <Typography sx={{ textAlign: 'center' }}>ผู้ใช้งาน</Typography>
                 </MenuItem>
-                <MenuItem onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>Member</Typography>
-                </MenuItem>
-                <MenuItem onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>Vip</Typography>
+                <MenuItem LinkComponent={Link} href='/admin/product'>
+                  <Typography sx={{ textAlign: 'center' }}>สินค้า</Typography>
                 </MenuItem>
               </Menu>
             </Box>
@@ -123,6 +120,9 @@ const ResponsiveAppBar = () => {
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               <Button LinkComponent={Link} href='/admin/user' sx={{ my: 2, color: 'white', display: 'block' }}>
                 <Typography>ผู้ใช้งาน</Typography>
+              </Button>
+              <Button LinkComponent={Link} href='/admin/product' sx={{ my: 2, color: 'white', display: 'block' }}>
+                <Typography>สินค้า</Typography>
               </Button>
             </Box>
             {status === 'authenticated' ? (

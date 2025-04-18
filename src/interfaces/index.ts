@@ -8,3 +8,20 @@ export interface UserInterface {
   createdAt?: Date
   updatedAt?: Date
 }
+
+export interface ProductInterface {
+  id: number
+  name: string
+  brandId: number
+  Brand?: BrandInterface
+  createdAt?: Date
+  updatedAt?: Date
+}
+
+export interface BrandInterface {
+  id: number
+  name: string
+  createdAt?: Date
+  updatedAt?: Date
+  products?: ProductInterface[]
+}
