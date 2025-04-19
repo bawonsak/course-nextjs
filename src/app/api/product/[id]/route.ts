@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, Prisma } from "@prisma/client"
 import { getToken } from "next-auth/jwt"
 import { NextRequest, NextResponse } from "next/server"
 import fs from 'fs'
@@ -88,13 +88,18 @@ export async function POST(request: NextRequest, { params }: { params: { id: num
       }
     }
 
+    const data = {
+      name,
+      brandId: brandId == 0 ? null : brandId
+    } as Prisma.ProductUpdateInput
+
+    if (imageurl) {
+      data.image = imageurl
+    }
+
     const updateProduct = await prisma.product.update({
       where: { id: Number(id) },
-      data: { 
-        name, 
-        brandId: brandId == 0 ? null : brandId,
-        image: imageurl == '' ? null : imageurl
-      }
+      data
     })
     return Response.json(updateProduct)
   } catch (error) {

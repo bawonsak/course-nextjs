@@ -24,6 +24,7 @@ import {
 } from '@mui/material'
 import Link from 'next/link'
 import Image from 'next/image'
+import { getProductImage } from '@/libs'
 
 const UserList = () => {
   const router = useRouter()
@@ -175,7 +176,7 @@ const UserList = () => {
                     <TableCell component='th' scope='row'>
                       {row.image ? (
                         <div className='w-[56px] h-[56px] relative rounded overflow-hidden'>
-                          <Image src={row.image} alt={row.name} layout={'fill'} objectFit={'cover'} />
+                          <Image src={getProductImage(row.image)} alt={row.name} layout={'fill'} objectFit={'cover'} />
                         </div>
                       ) : (
                         <>

@@ -94,6 +94,7 @@ const UserForm = ({ product }: Props) => {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0]
+
     if (selectedFile) {
       const objectUrl = URL.createObjectURL(selectedFile)
       setPreview(objectUrl)
