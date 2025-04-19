@@ -9,6 +9,7 @@ import axios from 'axios'
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCloudUpload } from '@fortawesome/free-solid-svg-icons'
+import { getProductImage } from '@/libs'
 
 type Props = {
   product?: ProductInterface
@@ -160,9 +161,7 @@ const UserForm = ({ product }: Props) => {
                   {product?.image && (
                     <div className='mt-4'>
                       <Image
-                        src={`${
-                          product.image.startsWith('https://storage.googleapis.com/') ? '' : process.env.NEXT_PUBLIC_URL
-                        }${product.image}`}
+                        src={getProductImage(product.image)}
                         alt='Uploaded'
                         className='rounded border shadow'
                         width={100}

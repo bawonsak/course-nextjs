@@ -1,22 +1,35 @@
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, Prisma } from "@prisma/client"
 import { getToken } from "next-auth/jwt"
 import { NextRequest } from "next/server"
 
 const prisma = new PrismaClient()
 
-export async function GET() {
+export async function GET(request: NextRequest) {
 
   try {
+    const searchParams = request.nextUrl.searchParams
+    const keyword = searchParams.get('keyword')?.trim()
+    const brandId = Number(searchParams.get('brandId') || 0)
+    const whereCondition: Prisma.ProductWhereInput = {
+        deleted: false 
+      }
+    
+      if (keyword) {
+        whereCondition.name = { contains: keyword, mode: 'insensitive' }
+      }
+    
+      if (brandId && brandId != 0) {
+        whereCondition.brandId = { equals: brandId }
+      }
+
     const products = await prisma.product.findMany({
       include: {
         Brand: true,
       },
-      where: {
-        deleted: false
-      },
+      where: whereCondition,
       orderBy: {
         createdAt: 'desc',
-      },
+      }
     })
     return Response.json(products)
   } catch (error) {
