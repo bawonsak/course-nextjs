@@ -1,7 +1,7 @@
 import { ProductInterface } from '@/interfaces'
-import EditProductPage from '@/pages/admin/product/EditProduct'
+import EditProductPage from '@/views/admin/product/EditProduct'
 import axios from 'axios'
-import { notFound } from 'next/navigation'
+// import { notFound } from 'next/navigation'
 import { cookies } from 'next/headers'
 
 const fetchData = async (id: number): Promise<ProductInterface | null> => {
@@ -25,11 +25,11 @@ const Page = async (props: { params: Promise<{ id: number }> }) => {
   const params = await props.params
   const data = await fetchData(params.id)
 
-  if (!data) {
-    return notFound()
-  }
+  // if (!data) {
+  //   return notFound()
+  // }
 
-  return <EditProductPage product={data} />
+  return <EditProductPage product={data!} />
 }
 
 export default Page

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client'
 import { getToken } from "next-auth/jwt"
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 

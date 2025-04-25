@@ -1,4 +1,4 @@
-import ProductList from '@/pages/admin/product/ProductList'
+import ProductList from '@/views/admin/product/ProductList'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {

@@ -1,4 +1,4 @@
-import UserList from '@/pages/admin/user/UserList'
+import UserList from '@/views/admin/user/UserList'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {

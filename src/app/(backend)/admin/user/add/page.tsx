@@ -1,4 +1,4 @@
-import AddUserPage from '@/pages/admin/user/AddUser'
+import AddUserPage from '@/views/admin/user/AddUser'
 
 import { Metadata } from 'next'
 
