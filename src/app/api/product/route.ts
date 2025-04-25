@@ -10,6 +10,10 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const keyword = searchParams.get('keyword')?.trim()
     const brandId = Number(searchParams.get('brandId') || 0)
+    const page = Number(searchParams.get('page') || 1)
+    const limit = Number(searchParams.get('limit') || 20)
+    const skip = (page - 1) * limit
+
     const whereCondition: Prisma.ProductWhereInput = {
         deleted: false 
       }
@@ -26,12 +30,25 @@ export async function GET(request: NextRequest) {
       include: {
         Brand: true,
       },
+      skip,
+      take: limit,
       where: whereCondition,
       orderBy: {
         createdAt: 'desc',
       }
     })
-    return Response.json(products)
+
+    const total = await prisma.product.count({
+      where: whereCondition
+    })
+
+    return Response.json({
+      items: products,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    })
   } catch (error) {
     return new Response(error as BodyInit, {
       status: 500,

@@ -20,35 +20,38 @@ import {
   TextField,
   Card,
   CardContent,
-  MenuItem
+  MenuItem,
+  Box,
+  Pagination
 } from '@mui/material'
 import Link from 'next/link'
 import Image from 'next/image'
 import { getProductImage } from '@/libs'
 
-const UserList = () => {
+type ProductType = {
+  items: ProductInterface[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+const ProductListList = () => {
   const router = useRouter()
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  // response api
   const [products, setProducts] = useState<ProductInterface[]>([])
+  const [page, setPage] = useState<number>(1)
+  const [limit] = useState<number>(2)
+  const [totalPages, setTotalPages] = useState(0)
+
+  // filter
   const [loading, setLoading] = useState<boolean>(false)
+  const [searchText, setSearchText] = useState('')
   const [keyword, setKeyword] = useState<string>('')
   const [brands, setBrands] = useState<BrandInterface[]>([])
   const [selectedBrand, setSelectedBrand] = useState<number>(0)
-
-  const fetchData = async () => {
-    try {
-      setLoading(true)
-      const { data } = await axios.get<ProductInterface[]>('/api/product', {
-        params: {
-          keyword,
-          brandId: selectedBrand
-        }
-      })
-      setProducts(data)
-      setLoading(false)
-    } catch {
-      setLoading(false)
-    }
-  }
 
   const handleDelete = async (product: ProductInterface) => {
     Swal.fire({
@@ -64,7 +67,7 @@ const UserList = () => {
         try {
           await axios.delete(`/api/product/${product.id}`)
 
-          fetchData()
+          setRefreshTrigger(prev => prev + 1)
 
           Swal.fire({
             title: 'สำเร็จ',
@@ -84,6 +87,15 @@ const UserList = () => {
     })
   }
 
+  const handlePageChange = (_: unknown, value: number) => {
+    setPage(value)
+  }
+
+  const handleSearchClick = () => {
+    setPage(1)
+    setKeyword(searchText)
+  }
+
   useEffect(() => {
     const getInitial = async () => {
       try {
@@ -96,14 +108,35 @@ const UserList = () => {
       }
     }
 
-    const getProducts = async () => {
-      const { data } = await axios.get<ProductInterface[]>('/api/product')
-      setProducts(data)
+    getInitial()
+  }, [])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        const { data } = await axios.get<ProductType>('/api/product', {
+          params: {
+            keyword,
+            brandId: selectedBrand,
+            page,
+            limit
+          }
+        })
+        setProducts(data.items)
+        setPage(data.page)
+        setTotalPages(data.totalPages)
+        setLoading(false)
+      } catch {
+        setProducts([])
+        setPage(1)
+        setTotalPages(0)
+        setLoading(false)
+      }
     }
 
-    getInitial()
-    getProducts()
-  }, [])
+    fetchData()
+  }, [keyword, limit, page, selectedBrand, refreshTrigger])
 
   return (
     <div>
@@ -122,8 +155,8 @@ const UserList = () => {
                   label='คำค้นหา'
                   variant='outlined'
                   fullWidth
-                  value={keyword}
-                  onChange={e => setKeyword(e.target.value)}
+                  value={searchText}
+                  onChange={e => setSearchText(e.target.value)}
                 />
               </Grid>
               <Grid size={6}>
@@ -145,7 +178,7 @@ const UserList = () => {
               </Grid>
               <Grid size={12}>
                 <div className='flex w-full justify-end gap-4'>
-                  <Button variant='contained' color={'info'} onClick={() => fetchData()}>
+                  <Button variant='contained' color={'info'} onClick={handleSearchClick}>
                     ค้นหา
                   </Button>
                 </div>
@@ -176,7 +209,7 @@ const UserList = () => {
                     <TableCell component='th' scope='row'>
                       {row.image ? (
                         <div className='w-[56px] h-[56px] relative rounded overflow-hidden'>
-                          <Image src={getProductImage(row.image)} alt={row.name} layout={'fill'} objectFit={'cover'} />
+                          <Image src={getProductImage(row.image)} alt={row.name} fill style={{ objectFit: 'cover' }} />
                         </div>
                       ) : (
                         <>
@@ -201,10 +234,15 @@ const UserList = () => {
               </TableBody>
             </Table>
           </TableContainer>
+          {totalPages > 1 ? (
+            <Box display='flex' justifyContent='center' mt={4}>
+              <Pagination count={totalPages} page={page} onChange={handlePageChange} color='primary' />
+            </Box>
+          ) : null}
         </>
       )}
     </div>
   )
 }
 
-export default UserList
+export default ProductListList
