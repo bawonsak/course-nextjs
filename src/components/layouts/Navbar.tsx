@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
@@ -11,18 +11,24 @@ import MenuIcon from '@mui/icons-material/Menu'
 import Container from '@mui/material/Container'
 import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
-import Tooltip from '@mui/material/Tooltip'
 import MenuItem from '@mui/material/MenuItem'
 import AdbIcon from '@mui/icons-material/Adb'
 import { useSession, signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCartShopping } from '@fortawesome/free-solid-svg-icons'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch } from '@/store'
+import { getCart } from '@/store/slices/cart'
 
 const ResponsiveAppBar = () => {
   const router = useRouter()
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null)
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null)
   const { data: session, status } = useSession()
+  const dispatch: AppDispatch = useDispatch()
+  const cartStore = useSelector((state: { cartReducer: { countItem: number } }) => state.cartReducer)
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget)
@@ -38,6 +44,10 @@ const ResponsiveAppBar = () => {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null)
   }
+
+  useEffect(() => {
+    dispatch(getCart())
+  }, [dispatch])
 
   return (
     <div>
@@ -121,23 +131,31 @@ const ResponsiveAppBar = () => {
               LOGO
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              <Button LinkComponent={Link} href='profile' sx={{ my: 2, color: 'white', display: 'block' }}>
+              <Button LinkComponent={Link} href='/profile' sx={{ my: 2, color: 'white', display: 'block' }}>
                 <Typography>Protected</Typography>
               </Button>
-              <Button LinkComponent={Link} href='member' sx={{ my: 2, color: 'white', display: 'block' }}>
+              <Button LinkComponent={Link} href='/member' sx={{ my: 2, color: 'white', display: 'block' }}>
                 <Typography>Member</Typography>
               </Button>
-              <Button LinkComponent={Link} href='vip' sx={{ my: 2, color: 'white', display: 'block' }}>
+              <Button LinkComponent={Link} href='/vip' sx={{ my: 2, color: 'white', display: 'block' }}>
                 <Typography>Vip</Typography>
               </Button>
             </Box>
             {status === 'authenticated' ? (
               <Box sx={{ flexGrow: 0 }}>
-                <Tooltip title='Open settings'>
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt={session?.user?.name || ''} src={session?.user?.image || ''} />
-                  </IconButton>
-                </Tooltip>
+                <IconButton
+                  sx={{ p: 0, marginRight: 2, position: 'relative' }}
+                  LinkComponent={Link}
+                  href='/member/cart'
+                >
+                  <FontAwesomeIcon icon={faCartShopping} color='#fff' />
+                  <div className='bg-red-600 w-5 h-5 rounded-full flex items-center justify-center text-white absolute text-sm top-[-10px] right-[-10px]'>
+                    {cartStore.countItem}
+                  </div>
+                </IconButton>
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt={session?.user?.name || ''} src={session?.user?.image || ''} />
+                </IconButton>
                 <Menu
                   sx={{ mt: '45px' }}
                   id='menu-appbar'

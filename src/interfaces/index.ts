@@ -18,6 +18,7 @@ export interface ProductInterface {
   updatedAt?: Date
   image?: string
   base64Image?: string
+  price: number
 }
 
 export interface BrandInterface {
@@ -26,4 +27,21 @@ export interface BrandInterface {
   createdAt?: Date
   updatedAt?: Date
   products?: ProductInterface[]
+}
+
+export interface CartInterface {
+  id: number
+  userId: number
+  status: string
+  createdAt: Date
+  updatedAt?: Date
+  CartItems?: CartItemInterface[]
+}
+
+export interface  CartItemInterface {
+  id: number
+  cartId: number
+  deleted: boolean
+  qty: number
+  Product: ProductInterface
 }

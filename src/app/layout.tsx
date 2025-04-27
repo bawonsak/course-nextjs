@@ -5,6 +5,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 
 import SessionProvider from '@/components/SessionProvider'
+import StoreProvider from '@/store/StoreProvider'
+import { ToastContainer } from 'react-toastify'
 
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
@@ -35,7 +37,10 @@ export default async function RootLayout({
   return (
     <html lang='en'>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <SessionProvider session={session}>{children}</SessionProvider>
+        <SessionProvider session={session}>
+          <StoreProvider>{children}</StoreProvider>
+          <ToastContainer autoClose={1000} />
+        </SessionProvider>
       </body>
     </html>
   )

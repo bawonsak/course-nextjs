@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ['localhost', 'storage.googleapis.com'],
+    domains: ['localhost', 'storage.googleapis.com', 'static.nike.com'],
   },
   typescript: {
     // !! WARN !!

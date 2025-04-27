@@ -19,6 +19,7 @@ model User {
   role          String    @default("member")
   deleted       Boolean   @default(false)
   accounts      Account[]
+  Cart          Cart[]
 }
 
 model Account {
@@ -40,7 +41,7 @@ model Account {
 }
 
 model Brand {
-  id        Int       @id
+  id        Int       @id @default(autoincrement())
   name      String?   @db.VarChar
   createdAt DateTime? @default(now()) @db.Timestamp(6)
   updatedAt DateTime? @db.Timestamp(6)
@@ -48,12 +49,36 @@ model Brand {
 }
 
 model Product {
-  id        Int       @id @default(autoincrement())
-  name      String    @db.VarChar
-  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  id        Int         @id @default(autoincrement())
+  name      String      @db.VarChar
+  createdAt DateTime?   @default(now()) @db.Timestamp(6)
   brandId   Int?
-  updatedAt DateTime? @db.Timestamp(6)
-  deleted   Boolean   @default(false)
+  updatedAt DateTime?   @db.Timestamp(6)
+  deleted   Boolean     @default(false)
   image     String?
-  Brand     Brand?    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  price     Decimal     @default(0) @db.Decimal(10, 2)
+  CartItems CartItems[]
+  Brand     Brand?      @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        Int         @id @default(autoincrement())
+  userId    Int
+  status    String      @db.VarChar
+  createdAt DateTime?   @default(now()) @db.Timestamp(6)
+  updatedAt DateTime?   @db.Timestamp(6)
+  User      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  CartItems CartItems[]
+}
+
+model CartItems {
+  id        Int       @id @default(autoincrement())
+  cartId    Int
+  productId Int
+  deleted   Boolean
+  qty       Int       @default(0)
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  updatedAt DateTime? @db.Timestamp(6)
+  Cart      Cart      @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  Product   Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
